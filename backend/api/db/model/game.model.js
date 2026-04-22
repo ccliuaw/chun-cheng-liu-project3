@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
-const gameSchema = require('../schema/game.schema');
+import mongoose from 'mongoose';
+import gameSchema from '../schema/game.schema.js'; // 必須加 .js
 
-module.exports = mongoose.model('Game', gameSchema);
+export default mongoose.model('Game', gameSchema);

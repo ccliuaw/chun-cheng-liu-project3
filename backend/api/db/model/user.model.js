@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-// 引入剛剛畫好的草圖
-const userSchema = require('../schema/user.schema'); 
+import mongoose from 'mongoose';
+import userSchema from '../schema/user.schema.js';
 
-module.exports = mongoose.model('User', userSchema);
+export default mongoose.model('User', userSchema);

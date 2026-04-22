@@ -1,30 +1,22 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import cookieParser from 'cookie-parser';
-import path, {dirname} from 'path';
+import dotenv from 'dotenv';
 
+dotenv.config(); // load environment variables from .env file
 
 const app = express();
+app.use(express.json()); // parse JSON data from frontend
 
-app.use(express.json());
-app.use(cookieParser())
-app.use(express.urlencoded({ extended: true }));
+// --- MongoDB connection settings ---
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+      console.log('Successfully connected to MongoDB!');
+  })
+  .catch((err) => {
+      console.error('MongoDB connection failed:', err.message);
+  });
 
-
-const MONGODB_URL = // INSERT MONGO DB URL HERE
-mongoose.connect(MONGODB_URL);
-const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'Error connecting to MongoDB:'));
-
-
-const frontend_dir = path.join(path.resolve(), 'dist')
-
-app.use(express.static(frontend_dir));
-app.get('*', function (req, res) {
-    res.sendFile(path.join(frontend_dir, "index.html"));
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-
-app.listen(8000, function() {
-    console.log("Starting server now...")
-})
