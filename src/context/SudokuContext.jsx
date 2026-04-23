@@ -60,24 +60,14 @@ export function SudokuProvider({ children }) {
     const [selectedCell, setSelectedCell] = useState(null);
     const [gameId, setGameId] = useState(Date.now());
 
-    // --- 🌟 全端版專用：載入來自 DB 的遊戲 ---
+    // --- loading games from DB ---
     const loadGameFromDB = (dbGameData) => {
-        // 1. 設定目前棋盤 (如果是新開的局，後端會給滿是 0 的陣列)
-        setBoard(dbGameData.board);
-        
-        // 2. 設定初始棋盤 (方便 Reset 功能回到最初的題目狀態)
+        setBoard(dbGameData.board);        
         setInitialBoard(dbGameData.initialBoard);
-        
-        // 3. 設定 GameId 來觸發 Timer 重置
-        // 如果是全新的遊戲，可以用 Date.now()；如果想要延續時間，可以自訂
-        setGameId(dbGameData._id); 
-        
-        // 4. 清除選中的格子
+        setGameId(dbGameData._id);
         setSelectedCell(null);
     };
 
-    // --- LocalStorage 建議改為「純存檔」而非「自動載入」 ---
-    // (在全端版中，這部分可以保留作為離線備援，但主導權在 fetch)
     useEffect(() => {
         if (board.length === 81) {
             localStorage.setItem('sudoku_save_normal', JSON.stringify({ board, initialBoard }));
@@ -86,7 +76,6 @@ export function SudokuProvider({ children }) {
         }
     }, [board, initialBoard]);
 
-    // 修改：將 startNormalGame 改為只負責「強制產生新題目」時使用 (或暫時用不到)
     const startNormalGame = (isNew = true) => {
         const newPuzzle = generateNormalBoard();
         setBoard(newPuzzle);
@@ -95,7 +84,6 @@ export function SudokuProvider({ children }) {
         setGameId(Date.now());
     };
 
-    // 修改：將 startEasyGame 同步
     const startEasyGame = (isNew = true) => {
         const newPuzzle = generateEasyBoard();
         setBoard(newPuzzle);

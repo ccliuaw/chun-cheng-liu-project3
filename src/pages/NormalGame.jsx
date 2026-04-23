@@ -5,17 +5,17 @@ import { SudokuContext } from '../context/SudokuContext';
 import Timer from '../components/Timer';
 
 export default function NormalGame() {
-    const { id } = useParams(); // 🌟 1. 從網址抓取這局遊戲的 ID
+    const { id } = useParams(); // get the game ID from the URL
     const navigate = useNavigate();
-    
-    // 🌟 2. 從 Context 拿出載入資料庫遊戲的函式
+
+    // loadGame From DB
     const { loadGameFromDB, board, isGameWon, resetGame } = useContext(SudokuContext);
     
     const [gameInfo, setGameInfo] = useState(null);
     const [errorMsg, setErrorMsg] = useState('');
 
     useEffect(() => {
-        // 🌟 3. 進入頁面時，去後端把這局遊戲的資料抓回來
+        // get the game data from backend API using the ID, then load it into Context for Board to render
         const fetchGame = async () => {
             try {
                 const response = await fetch(`http://localhost:8000/api/sudoku/${id}`, {
@@ -25,7 +25,7 @@ export default function NormalGame() {
                 
                 if (response.ok) {
                     setGameInfo(data);
-                    loadGameFromDB(data); // 把抓回來的陣列餵給你的 Context 和 Board
+                    loadGameFromDB(data);
                 } else {
                     setErrorMsg(data.error);
                 }
@@ -43,7 +43,7 @@ export default function NormalGame() {
 
     return (
         <div className="game-page-container">
-            {/* 顯示從資料庫來的名稱與作者 */}
+            {/* show game name and creator */}
             <h2>{gameInfo.name} (9x9)</h2>
             <p style={{ marginBottom: '20px' }}>Created by: {gameInfo.creator}</p>
 
@@ -55,7 +55,6 @@ export default function NormalGame() {
                 </div>
             )}
 
-            {/* 你的 Board 元件一樣完美運作 */}
             {board && board.length > 0 && <Board />}
 
             <div className="button-container">
