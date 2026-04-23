@@ -58,9 +58,26 @@ export function SudokuProvider({ children }) {
     const [board, setBoard] = useState([]);
     const [initialBoard, setInitialBoard] = useState([]);
     const [selectedCell, setSelectedCell] = useState(null);
-    const [gameId, setGameId] = useState(Date.now()); // add a gameId state to trigger timer resets
+    const [gameId, setGameId] = useState(Date.now());
 
-    // --- LocalStorage Auto-Save Logic ---
+    // --- 🌟 全端版專用：載入來自 DB 的遊戲 ---
+    const loadGameFromDB = (dbGameData) => {
+        // 1. 設定目前棋盤 (如果是新開的局，後端會給滿是 0 的陣列)
+        setBoard(dbGameData.board);
+        
+        // 2. 設定初始棋盤 (方便 Reset 功能回到最初的題目狀態)
+        setInitialBoard(dbGameData.initialBoard);
+        
+        // 3. 設定 GameId 來觸發 Timer 重置
+        // 如果是全新的遊戲，可以用 Date.now()；如果想要延續時間，可以自訂
+        setGameId(dbGameData._id); 
+        
+        // 4. 清除選中的格子
+        setSelectedCell(null);
+    };
+
+    // --- LocalStorage 建議改為「純存檔」而非「自動載入」 ---
+    // (在全端版中，這部分可以保留作為離線備援，但主導權在 fetch)
     useEffect(() => {
         if (board.length === 81) {
             localStorage.setItem('sudoku_save_normal', JSON.stringify({ board, initialBoard }));
@@ -69,42 +86,17 @@ export function SudokuProvider({ children }) {
         }
     }, [board, initialBoard]);
 
-    // --- Game Initialization Logic ---
-    // isNew = false means try to load from localStorage first
-    // isNew = true means force a brand new puzzle (for "New Game" button)
-    const startNormalGame = (isNew = false) => {
-        if (!isNew) {
-            const saved = localStorage.getItem('sudoku_save_normal');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                setBoard(parsed.board);
-                setInitialBoard(parsed.initialBoard);
-                setGameId('loaded_normal'); // Special string to tell the timer to resume
-                setSelectedCell(null);
-                return;
-            }
-        }
-
+    // 修改：將 startNormalGame 改為只負責「強制產生新題目」時使用 (或暫時用不到)
+    const startNormalGame = (isNew = true) => {
         const newPuzzle = generateNormalBoard();
         setBoard(newPuzzle);
         setInitialBoard(newPuzzle);
         setSelectedCell(null);
-        setGameId(Date.now()); // New timestamp tells the timer to reset to 0
+        setGameId(Date.now());
     };
 
-    const startEasyGame = (isNew = false) => {
-        if (!isNew) {
-            const saved = localStorage.getItem('sudoku_save_easy');
-            if (saved) {
-                const parsed = JSON.parse(saved);
-                setBoard(parsed.board);
-                setInitialBoard(parsed.initialBoard);
-                setGameId('loaded_easy');
-                setSelectedCell(null);
-                return;
-            }
-        }
-
+    // 修改：將 startEasyGame 同步
+    const startEasyGame = (isNew = true) => {
         const newPuzzle = generateEasyBoard();
         setBoard(newPuzzle);
         setInitialBoard(newPuzzle);
@@ -152,10 +144,11 @@ export function SudokuProvider({ children }) {
         updateCell,
         startNormalGame,
         startEasyGame,
+        loadGameFromDB,
         resetGame,
-        conflicts, // Export conflicts so Cell components can read it
-        isGameWon, // Export the winning state
-        gameId // Export the gameId
+        conflicts,
+        isGameWon,
+        gameId
     };
 
     return (

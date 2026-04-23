@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 export default function Selection() {
-    const puzzles = [
-        { id: 1, name: "The Iron Logic", author: "Brain", difficulty: "Hard (9x9)", path: "/games/normal" },
-        { id: 2, name: "Sudoku Inferno", author: "Jack", difficulty: "Hard (9x9)", path: "/games/normal" },
-        { id: 3, name: "The Unsolvable", author: "LeBron", difficulty: "Hard (9x9)", path: "/games/normal" }
-    ];
-
+    // component state for storing games, loading status, and error messages
+    const [games, setGames] = useState([]);
     const [isCreating, setIsCreating] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const navigate = useNavigate();
 
-    // handle create game button click
+    // fetch games from the backend API
+    const fetchGames = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/api/sudoku', {
+                credentials: 'include'
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                setGames(data); // save the fetched games into state
+            } else {
+                console.error('Failed to fetch games:', data.error);
+            }
+        } catch (error) {
+            console.error('Error fetching games:', error);
+        }
+    };
+
+    // using useEffect to fetch games when the component mounts
+    useEffect(() => {
+        fetchGames();
+    }, []);
+
+    // handle API request for creating a new game
     const handleCreateGame = async (difficulty) => {
         setIsCreating(true);
         setErrorMsg('');
@@ -20,23 +39,16 @@ export default function Selection() {
         try {
             const response = await fetch('http://localhost:8000/api/sudoku', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // include credentials to send cookies (for authentication)
-                credentials: 'include', 
-                body: JSON.stringify({ difficulty }), 
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ difficulty }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                // successfully created a new game, navigate to the game page (you can customize this to go to the specific game page if you have one)
                 alert(`Game created successfully! Name: ${data.game.name}`);
-
-                // In a real application, you would typically fetch the game list again or redirect to the specific game page
-                // Here we simply reload the page so you can see the results in the terminal or database
-                window.location.reload();
+                fetchGames();
             } else {
                 setErrorMsg(data.error || 'Failed to create game.');
             }
@@ -55,24 +67,23 @@ export default function Selection() {
                 Choose a specific challenge from our list below, or create your own!
             </p>
 
-            {/* --- create new game section --- */}
             <div className="create-game-section" style={{ backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
                 <h3>✨ Create a New Game</h3>
                 <p>Generate a new puzzle with a unique 3-word name.</p>
-                
+
                 {errorMsg && <p style={{ color: 'red', fontWeight: 'bold' }}>{errorMsg}</p>}
-                
+
                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <button 
-                        className="game-btn btn-easy" 
+                    <button
+                        className="game-btn btn-easy"
                         onClick={() => handleCreateGame('EASY')}
                         disabled={isCreating}
                     >
                         {isCreating ? 'Creating...' : '+ Create Easy Game'}
                     </button>
-                    
-                    <button 
-                        className="game-btn btn-normal" 
+
+                    <button
+                        className="game-btn btn-normal"
                         onClick={() => handleCreateGame('NORMAL')}
                         disabled={isCreating}
                     >
@@ -80,7 +91,6 @@ export default function Selection() {
                     </button>
                 </div>
             </div>
-            {/* ----------------------------- */}
 
             <h3 style={{ marginTop: '20px' }}>Available Games</h3>
             <table className="selection-table">
@@ -89,20 +99,32 @@ export default function Selection() {
                         <th>Puzzle Name</th>
                         <th>Author</th>
                         <th>Difficulty</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {puzzles.map((puzzle) => (
-                        <tr key={puzzle.id}>
+                    {/* Render the game rows */}
+                    {games.map((game) => (
+                        <tr key={game._id}>
                             <td>
-                                <Link to={puzzle.path} className="selection-link">
-                                    {puzzle.name}
+                                <Link to={`/games/${game.difficulty.toLowerCase()}/${game._id}`} className="selection-link">
+                                    {game.name}
                                 </Link>
                             </td>
-                            <td>{puzzle.author}</td>
-                            <td>{puzzle.difficulty}</td>
+                            <td>{game.creator}</td>
+                            <td>{game.difficulty}</td>
+                            <td>{game.isCompleted ? '✅ Solved' : '⏳ Playing'}</td>
                         </tr>
                     ))}
+
+                    {/* If no games are available, show a message */}
+                    {games.length === 0 && (
+                        <tr>
+                            <td colSpan="4" style={{ textAlign: 'center', padding: '15px' }}>
+                                No games available right now. Be the first to create one!
+                            </td>
+                        </tr>
+                    )}
                 </tbody>
             </table>
         </div>

@@ -6,7 +6,7 @@ const router = express.Router();
 
 // 20 words for test
 const wordList = [
-    'Apple', 'Banana', 'Cat', 'Dog', 'Elephant', 'Frog', 'Ghost', 'House', 'Ice', 'Juice', 
+    'Apple', 'Banana', 'Cat', 'Dog', 'Elephant', 'Frog', 'Ghost', 'House', 'Ice', 'Juice',
     'Kite', 'Lion', 'Moon', 'Night', 'Ocean', 'Piano', 'Queen', 'Rose', 'Sun', 'Tree'
 ];
 
@@ -36,23 +36,21 @@ const generateUniqueName = async () => {
 router.post('/sudoku', verifyToken, async (req, res) => {
     try {
         const { difficulty, board, initialBoard } = req.body;
-
-        // 1. Generate a unique name for the game
         const uniqueName = await generateUniqueName();
 
-        // 2. Create a new game record
+        const boardSize = difficulty === 'EASY' ? 36 : 81;
+
         const newGame = new Game({
             name: uniqueName,
-            difficulty: difficulty || 'EASY', // Default to EASY
-            creator: req.user.username,       // Username extracted from token
-            board: board || [],               // Expecting an array of 81 numbers from frontend
-            initialBoard: initialBoard || [],
+            difficulty: difficulty || 'NORMAL',
+            creator: req.user.username,
+            board: board || Array(boardSize).fill(0),
+            initialBoard: initialBoard || Array(boardSize).fill(0),
             isCompleted: false
         });
 
         await newGame.save();
         res.status(201).json({ message: 'Game created successfully', game: newGame });
-
     } catch (error) {
         console.error('Create Game Error:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -67,6 +65,24 @@ router.get('/sudoku', verifyToken, async (req, res) => {
         res.status(200).json(games);
     } catch (error) {
         res.status(500).json({ error: 'Failed to fetch games' });
+    }
+});
+
+// Create a new API to get a single game by ID (GET /api/sudoku/:id)
+router.get('/sudoku/:id', verifyToken, async (req, res) => {
+    try {
+        const gameId = req.params.id;
+        const game = await Game.findById(gameId);
+
+        if (!game) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        res.status(200).json(game);
+    } catch (error) {
+        console.error('Fetch Single Game Error:', error);
+        // we return a 400 Bad Request for invalid ID and 500 for other errors
+        res.status(400).json({ error: 'Invalid game ID format' });
     }
 });
 

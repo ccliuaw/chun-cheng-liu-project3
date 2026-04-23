@@ -24,8 +24,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/games" element={<Selection />} />
-            <Route path="/games/normal" element={<NormalGame />} />
-            <Route path="/games/easy" element={<EasyGame />} />
+            {/* <Route path="/games/normal" element={<NormalGame />} />
+            <Route path="/games/easy" element={<EasyGame />} /> */}
+            <Route path="/games/normal/:id" element={<NormalGame />} />
+            <Route path="/games/easy/:id" element={<EasyGame />} />
             <Route path="/rules" element={<Rules />} />
             <Route path="/scores" element={<HighScores />} />
             <Route path="/login" element={<Login />} />
