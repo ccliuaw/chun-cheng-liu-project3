@@ -37,10 +37,17 @@ router.post('/register', async (req, res) => {
             expiresIn: '1d' // Token expires in 1 day
         });
 
+        // res.cookie('token', token, {
+        //     httpOnly: true, // Prevent XSS attacks
+        //     secure: process.env.NODE_ENV === 'production',
+        //     sameSite: 'strict'
+        // });
+
         res.cookie('token', token, {
-            httpOnly: true, // Prevent XSS attacks
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 24 * 60 * 60 * 1000 // 1 day
         });
 
         res.status(201).json({ message: 'User registered successfully', username: newUser.username });
@@ -78,10 +85,17 @@ router.post('/login', async (req, res) => {
         });
 
         // 5. Set token in Cookie
+        // res.cookie('token', token, {
+        //     httpOnly: true,
+        //     secure: process.env.NODE_ENV === 'production',
+        //     sameSite: 'strict'
+        // });
+
         res.cookie('token', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict'
+            secure: true,      
+            sameSite: 'none',  
+            maxAge: 24 * 60 * 60 * 1000 // 1 day
         });
 
         res.status(200).json({ message: 'Logged in successfully', username: user.username });

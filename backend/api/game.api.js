@@ -53,7 +53,7 @@ router.post('/', verifyToken, async (req, res) => {
 });
 
 // --- get all games ---
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const games = await Game.find().sort({ createdAt: -1 });
         res.status(200).json(games);
@@ -63,7 +63,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // --- get single game content (GET /api/sudoku/:id) ---
-router.get('/:id', verifyToken, async (req, res) => {
+router.get('/:id', async (req, res) => {
     try {
         const game = await Game.findById(req.params.id);
         if (!game) {
@@ -101,7 +101,7 @@ router.put('/:id', verifyToken, async (req, res) => {
 
 // --- High Score API (GET /api/highscore) ---
 // Returns a list of users and their total wins, sorted by wins descending [cite: 110, 111]
-router.get('/highscore/list', verifyToken, async (req, res) => {
+router.get('/highscore/list', async (req, res) => {
     try {
         // Use MongoDB aggregation to count completed games per user
         const highscores = await Game.aggregate([
