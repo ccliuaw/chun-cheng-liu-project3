@@ -7,7 +7,6 @@ export default function Selection() {
     const [isCreating, setIsCreating] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
-    // --- 1. get all games ---
     const fetchGames = async () => {
         try {
             const response = await fetch('http://localhost:8000/api/sudoku', {
@@ -29,12 +28,10 @@ export default function Selection() {
         fetchGames();
     }, []);
 
-    // --- 2. Create a new game ---
     const handleCreateGame = async (difficulty) => {
         setIsCreating(true);
         setErrorMsg('');
 
-        // 🌟 Generate the puzzle numbers on the frontend first
         const newPuzzle = difficulty === 'EASY' ? generateEasyBoard() : generateNormalBoard();
 
         try {
@@ -53,7 +50,7 @@ export default function Selection() {
 
             if (response.ok) {
                 alert(`Game created successfully! Name: ${data.game.name}`);
-                fetchGames(); // Refresh the list to show the new game
+                fetchGames(); 
             } else {
                 setErrorMsg(data.error || 'Failed to create game.');
             }
@@ -65,6 +62,17 @@ export default function Selection() {
         }
     };
 
+    // Helper function to format date as "Jan 1, 2020"
+    const formatDate = (dateString) => {
+        if (!dateString) return 'Unknown Date';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
     return (
         <div className="static-page-container selection-container">
             <h2 className="page-title">Game Selection</h2>
@@ -72,7 +80,6 @@ export default function Selection() {
                 Choose a specific challenge from our list below, or create your own!
             </p>
 
-            {/* --- Create Game Section --- */}
             <div className="create-game-section" style={{ backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
                 <h3>✨ Create a New Game</h3>
                 <p>Generate a new puzzle with a unique 3-word name.</p>
@@ -80,7 +87,6 @@ export default function Selection() {
                 {errorMsg && <p style={{ color: 'red', fontWeight: 'bold' }}>{errorMsg}</p>}
                 
                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    {/* 🌟 This button triggers handleCreateGame */}
                     <button 
                         className="game-btn btn-easy" 
                         onClick={() => handleCreateGame('EASY')}
@@ -106,21 +112,21 @@ export default function Selection() {
                         <th>Puzzle Name</th>
                         <th>Author</th>
                         <th>Difficulty</th>
-                        <th>Status</th>
+                        <th>Created Date</th>
                     </tr>
                 </thead>
                 <tbody>
                     {games.map((game) => (
                         <tr key={game._id}>
                             <td>
-                                {/* Navigate to different page paths based on difficulty */}
                                 <Link to={`/games/${game.difficulty.toLowerCase()}/${game._id}`} className="selection-link">
                                     {game.name}
                                 </Link>
                             </td>
                             <td>{game.creator}</td>
                             <td>{game.difficulty}</td>
-                            <td>{game.isCompleted ? '✅ Solved' : '⏳ Playing'}</td>
+                            {/* Formatting the timestamp to required format */}
+                            <td>{formatDate(game.createdAt)}</td>
                         </tr>
                     ))}
                     

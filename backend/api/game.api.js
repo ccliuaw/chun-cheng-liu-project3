@@ -124,4 +124,30 @@ router.get('/highscore/list', verifyToken, async (req, res) => {
     }
 });
 
+// DELETE: Remove a game by ID (Bonus Challenge)
+// Only the creator of the game is allowed to delete it 
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        const gameId = req.params.id;
+        const game = await Game.findById(gameId);
+
+        if (!game) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
+
+        // Security Check: Ensure only the creator can delete 
+        if (game.creator !== req.user.username) {
+            return res.status(403).json({ error: 'You are not authorized to delete this game' });
+        }
+
+        await Game.findByIdAndDelete(gameId);
+        
+        // Note: High scores will automatically update since they are aggregated from the remaining games in the database 
+        res.status(200).json({ message: 'Game deleted successfully' });
+    } catch (error) {
+        console.error("Delete Game Error:", error);
+        res.status(500).json({ error: 'Failed to delete game' });
+    }
+});
+
 export default router;

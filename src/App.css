@@ -231,6 +231,20 @@ h2 {
 
 .btn-reset:hover { background-color: #c0392b; }
 
+.button-container .game-btn.btn-delete {
+    background-color: #636e72; /* Subtle gray for a destructive but secondary action */
+    color: white;
+}
+
+.button-container .game-btn.btn-delete:hover {
+    background-color: #2d3436; /* Darker when hovered */
+}
+
+/* Optional: If you want it to stand out as a warning */
+.button-container .game-btn.btn-delete:active {
+    background-color: #d63031; /* Bright red only on click to show danger */
+}
+
 .timer-text {
     font-size: 1.2rem;
     font-weight: bold;
