@@ -1,36 +1,63 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 export default function HighScores() {
-    const leaderboardData = [
-        { id: 1, rank: 1, username: "SudokuKing99", solved: 452 },
-        { id: 2, rank: 2, username: "LogicMaster", solved: 380 },
-        { id: 3, rank: 3, username: "PuzzleQueen", solved: 315 },
-        { id: 4, rank: 4, username: "GridRunner", solved: 210 },
-        { id: 5, rank: 5, username: "NewbieUser", solved: 15 }
-    ];
+    const [scores, setScores] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchHighScores = async () => {
+            try {
+                // Fetch high score data from the backend [cite: 110]
+                const response = await fetch('http://localhost:8000/api/sudoku/highscore/list', {
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    setScores(data);
+                } else {
+                    setError(data.error || 'Failed to load scores');
+                }
+            } catch (err) {
+                setError('Server connection error');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHighScores();
+    }, []);
+
+    if (loading) return <div className="static-page-container"><h3>Loading High Scores...</h3></div>;
+    if (error) return <div className="static-page-container"><h3 style={{ color: 'red' }}>{error}</h3></div>;
 
     return (
         <div className="static-page-container leaderboard-container">
-            <h2 className="page-title">Leaderboard</h2>
-
-            <table className="leaderboard-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Username</th>
-                        <th>Puzzles Solved</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {leaderboardData.map((player) => (
-                        <tr key={player.id}>
-                            <td className="rank-cell">{player.rank}</td>
-                            <td>{player.username}</td>
-                            <td className="solved-cell">{player.solved}</td>
+            <h2 className="page-title">High Scores</h2>
+            
+            {scores.length === 0 ? (
+                <p>No champions yet. Be the first to win!</p>
+            ) : (
+                <table className="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Username</th>
+                            <th>Games Won</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {scores.map((score, index) => (
+                            <tr key={score.username}>
+                                <td className="rank-cell">{index + 1}</td>
+                                <td>{score.username}</td>
+                                <td className="solved-cell">{score.wins}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
         </div>
     );
 }

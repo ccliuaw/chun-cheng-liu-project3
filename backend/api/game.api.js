@@ -99,4 +99,29 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 });
 
+// --- High Score API (GET /api/highscore) ---
+// Returns a list of users and their total wins, sorted by wins descending [cite: 110, 111]
+router.get('/highscore/list', verifyToken, async (req, res) => {
+    try {
+        // Use MongoDB aggregation to count completed games per user
+        const highscores = await Game.aggregate([
+            { $match: { isCompleted: true } }, // Only count won games
+            {
+                $group: {
+                    _id: "$creator", // Group by the username of the player
+                    wins: { $sum: 1 } // Count the number of games
+                }
+            },
+            { $sort: { wins: -1, _id: 1 } }, // Sort by wins (desc) and then username (asc) 
+            { $project: { username: "$_id", wins: 1, _id: 0 } }
+        ]);
+
+        // Filter out users with 0 wins is handled by $match 
+        res.status(200).json(highscores);
+    } catch (error) {
+        console.error("Highscore Fetch Error:", error);
+        res.status(500).json({ error: 'Failed to fetch high scores' });
+    }
+});
+
 export default router;

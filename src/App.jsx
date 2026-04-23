@@ -3,7 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { SudokuProvider } from './context/SudokuContext';
 
-// Import all your page components here
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Selection from './pages/Selection';
@@ -24,8 +23,6 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/games" element={<Selection />} />
-            {/* <Route path="/games/normal" element={<NormalGame />} />
-            <Route path="/games/easy" element={<EasyGame />} /> */}
             <Route path="/games/normal/:id" element={<NormalGame />} />
             <Route path="/games/easy/:id" element={<EasyGame />} />
             <Route path="/rules" element={<Rules />} />

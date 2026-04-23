@@ -19,63 +19,105 @@ body {
     color: var(--text-color);
     min-height: 100vh;
     display: flex;
-    flex-direction: row;
+    flex-direction: column; /* Modified from row */
 }
 
 /* --- 2. NAVIGATION BAR --- */
-nav {
-    background: var(--primary-color);
-    width: 250px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
+.navbar {
     display: flex;
-    flex-direction: column;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
     z-index: 1000;
+    width: 100%;
 }
 
-nav h1 {
+.navbar-brand a {
     color: white;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-nav ul {
-    list-style: none;
-}
-
-nav a {
+    font-size: 1.5rem;
+    font-weight: bold;
     text-decoration: none;
+}
+
+.navbar-links {
+    display: flex;
+    list-style: none;
+    gap: 1.5rem;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar-links a {
     color: #bdc3c7;
-    display: block;
-    padding: 15px;
-    font-size: 1.1rem;
-    transition: color 0.3s ease, padding-left 0.3s ease;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease-in-out;
 }
 
-nav a:hover {
+.navbar-links a:hover,
+.navbar-links a.active {
     color: var(--accent-color);
-    padding-left: 20px;
 }
 
-nav a.active {
+/* User logged-in states */
+.user-profile {
+    margin-left: 1rem;
+    padding-right: 1rem;
+    border-right: 1px solid #7f8c8d;
+}
+
+.username-text {
+    color: #f1c40f;
+    font-size: 1rem;
+}
+
+.logout-btn {
+    background-color: #e74c3c;
     color: white;
-    border-left: 4px solid var(--accent-color);
-    background-color: rgba(255,255,255,0.05);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.logout-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Auth links */
+.auth-link {
+    color: #ecf0f1;
+}
+
+.auth-register {
+    background-color: #3498db;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: white;
+}
+
+.auth-register:hover {
+    background-color: #2980b9;
 }
 
 /* --- 3. MAIN CONTENT AREA --- */
 main {
-    margin-left: 250px;
+    /* Removed margin-left: 250px */
     padding: 40px;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    flex: 1; /* Added to fill remaining space */
 }
 
 h2 {
@@ -124,12 +166,14 @@ h2 {
     background-color: #e8f6f3;
 }
 
-.cell.border-right-thick {
-    border-right: 3px solid #2c3e50 !important;
+.sudoku-board-9x9 .cell.border-right-thick,
+.sudoku-board-6x6 .cell.border-right-thick {
+    border-right: 3px solid #2c3e50;
 }
 
-.cell.border-bottom-thick {
-    border-bottom: 3px solid #2c3e50 !important;
+.sudoku-board-9x9 .cell.border-bottom-thick,
+.sudoku-board-6x6 .cell.border-bottom-thick {
+    border-bottom: 3px solid #2c3e50;
 }
 
 .cell.fixed {
@@ -361,7 +405,7 @@ h2 {
 
 .credits-link:hover { color: #2980b9; text-decoration: underline; }
 
-/* --- 11. LEADERBOARD PAGE --- */
+/* --- 11. LEADERBOARD PAGE (No !important) --- */
 .leaderboard-container {
     display: flex;
     flex-direction: column;
@@ -376,17 +420,19 @@ h2 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    margin-top: 20px;
 }
 
 .leaderboard-table th {
-    background-color: #e67e22;
+    background-color: var(--accent-color); /* Uses your #e67e22 variable */
     color: white;
     padding: 15px;
     text-align: left;
 }
 
-.leaderboard-table th:first-child,
-.leaderboard-table th:last-child {
+/* Using combined selectors for specificity instead of !important */
+.leaderboard-table th.rank-column,
+.leaderboard-table th.wins-column {
     text-align: center;
 }
 
@@ -395,10 +441,22 @@ h2 {
     border-bottom: 1px solid #eee;
 }
 
-.leaderboard-table tbody tr:nth-child(even) { background-color: #f9f9f9; }
-.leaderboard-table tr:last-child td { border-bottom: none; }
-.rank-cell { text-align: center; font-weight: bold; }
-.solved-cell { text-align: center; }
+.leaderboard-table tbody tr:nth-child(even) { 
+    background-color: #f9f9f9; 
+}
+
+.leaderboard-table tbody tr:last-child td { 
+    border-bottom: none; 
+}
+
+.leaderboard-table .rank-cell { 
+    text-align: center; 
+    font-weight: bold; 
+}
+
+.leaderboard-table .solved-cell { 
+    text-align: center; 
+}
 
 /* --- 12. AUTHENTICATION PAGES (Login / Register) --- */
 .auth-page-container {
@@ -456,45 +514,29 @@ h2 {
 /* --- 13. RESPONSIVE MOBILE DESIGN --- */
 @media (max-width: 768px) {
     body {
+        padding-bottom: 0; /* Removed bottom padding */
+    }
+
+    .navbar {
         flex-direction: column;
-        padding-bottom: 80px; 
+        padding: 10px;
+        gap: 15px;
     }
 
-    nav {
-        width: 100%;
-        height: auto;
-        bottom: 0;
-        top: auto;
-        left: 0;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 10px 0;
-        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    .navbar-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
     }
 
-    nav h1 { display: none; }
-    
-    nav ul {
-        display: flex;
-        width: 100%;
-        justify-content: space-around;
+    .user-profile {
+        border-right: none;
+        margin-left: 0;
+        padding-right: 0;
     }
-
-    nav a {
-        padding: 5px;
-        font-size: 0.8rem;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    nav a:hover { padding-left: 5px; }
 
     main {
-        margin-left: 0;
         padding: 20px;
-        width: 100%;
     }
 
     .cell {
