@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoutes from './backend/api/user.api.js';
+import gameRoutes from './backend/api/game.api.js';
 dotenv.config(); // load environment variables from .env file
 
 const app = express();
@@ -27,6 +28,7 @@ mongoose.connect(process.env.MONGODB_URI)
   });
 
 app.use('/api/user', userRoutes); // use user routes
+app.use('/api', gameRoutes); // use game routes
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

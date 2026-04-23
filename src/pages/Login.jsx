@@ -19,6 +19,7 @@ export default function Login() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
+                credentials: 'include', // include credentials to send cookies (for authentication)
                 body: JSON.stringify({ username, password }),
             });
 
