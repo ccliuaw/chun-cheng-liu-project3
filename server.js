@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGODB_URI)
   });
 
 app.use('/api/user', userRoutes); // use user routes
-app.use('/api', gameRoutes); // use game routes
+app.use('/api/sudoku', gameRoutes); // use game routes
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {
