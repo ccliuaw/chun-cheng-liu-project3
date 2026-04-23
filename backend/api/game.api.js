@@ -31,8 +31,7 @@ const generateUniqueName = async () => {
     return name;
 };
 
-// Create new game API (POST /api/sudoku)
-// Note: We place the verifyToken middleware in the middle to ensure that only logged-in users can create games
+// Create new game API (POST /api/sudoku) with support for pre-generated boards
 router.post('/sudoku', verifyToken, async (req, res) => {
     try {
         const { difficulty, board, initialBoard } = req.body;
@@ -44,6 +43,7 @@ router.post('/sudoku', verifyToken, async (req, res) => {
             name: uniqueName,
             difficulty: difficulty || 'NORMAL',
             creator: req.user.username,
+            // if the frontend provides a pre-generated board, use it; otherwise, initialize with an empty board
             board: board || Array(boardSize).fill(0),
             initialBoard: initialBoard || Array(boardSize).fill(0),
             isCompleted: false
@@ -52,8 +52,7 @@ router.post('/sudoku', verifyToken, async (req, res) => {
         await newGame.save();
         res.status(201).json({ message: 'Game created successfully', game: newGame });
     } catch (error) {
-        console.error('Create Game Error:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({ error: 'Failed to create game' });
     }
 });
 

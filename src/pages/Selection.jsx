@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { generateNormalBoard, generateEasyBoard } from '../utils/sudokuGenerator';
 
 export default function Selection() {
-    // component state for storing games, loading status, and error messages
     const [games, setGames] = useState([]);
     const [isCreating, setIsCreating] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
-    const navigate = useNavigate();
 
-    // fetch games from the backend API
+    // --- 1. get all games ---
     const fetchGames = async () => {
         try {
             const response = await fetch('http://localhost:8000/api/sudoku', {
                 credentials: 'include'
             });
             const data = await response.json();
-
+            
             if (response.ok) {
-                setGames(data); // save the fetched games into state
+                setGames(data);
             } else {
                 console.error('Failed to fetch games:', data.error);
             }
@@ -26,29 +25,35 @@ export default function Selection() {
         }
     };
 
-    // using useEffect to fetch games when the component mounts
     useEffect(() => {
         fetchGames();
     }, []);
 
-    // handle API request for creating a new game
+    // --- 2. Create a new game ---
     const handleCreateGame = async (difficulty) => {
         setIsCreating(true);
         setErrorMsg('');
+
+        // 🌟 Generate the puzzle numbers on the frontend first
+        const newPuzzle = difficulty === 'EASY' ? generateEasyBoard() : generateNormalBoard();
 
         try {
             const response = await fetch('http://localhost:8000/api/sudoku', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ difficulty }),
+                credentials: 'include', 
+                body: JSON.stringify({ 
+                    difficulty, 
+                    board: newPuzzle, 
+                    initialBoard: newPuzzle 
+                }),
             });
 
             const data = await response.json();
 
             if (response.ok) {
                 alert(`Game created successfully! Name: ${data.game.name}`);
-                fetchGames();
+                fetchGames(); // Refresh the list to show the new game
             } else {
                 setErrorMsg(data.error || 'Failed to create game.');
             }
@@ -67,27 +72,29 @@ export default function Selection() {
                 Choose a specific challenge from our list below, or create your own!
             </p>
 
+            {/* --- Create Game Section --- */}
             <div className="create-game-section" style={{ backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '8px', marginBottom: '30px' }}>
                 <h3>✨ Create a New Game</h3>
                 <p>Generate a new puzzle with a unique 3-word name.</p>
-
+                
                 {errorMsg && <p style={{ color: 'red', fontWeight: 'bold' }}>{errorMsg}</p>}
-
+                
                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-                    <button
-                        className="game-btn btn-easy"
+                    {/* 🌟 This button triggers handleCreateGame */}
+                    <button 
+                        className="game-btn btn-easy" 
                         onClick={() => handleCreateGame('EASY')}
                         disabled={isCreating}
                     >
-                        {isCreating ? 'Creating...' : '+ Create Easy Game'}
+                        {isCreating ? 'Creating...' : '+ Create Easy Game (6x6)'}
                     </button>
-
-                    <button
-                        className="game-btn btn-normal"
+                    
+                    <button 
+                        className="game-btn btn-normal" 
                         onClick={() => handleCreateGame('NORMAL')}
                         disabled={isCreating}
                     >
-                        {isCreating ? 'Creating...' : '+ Create Normal Game'}
+                        {isCreating ? 'Creating...' : '+ Create Normal Game (9x9)'}
                     </button>
                 </div>
             </div>
@@ -103,10 +110,10 @@ export default function Selection() {
                     </tr>
                 </thead>
                 <tbody>
-                    {/* Render the game rows */}
                     {games.map((game) => (
                         <tr key={game._id}>
                             <td>
+                                {/* Navigate to different page paths based on difficulty */}
                                 <Link to={`/games/${game.difficulty.toLowerCase()}/${game._id}`} className="selection-link">
                                     {game.name}
                                 </Link>
@@ -116,8 +123,7 @@ export default function Selection() {
                             <td>{game.isCompleted ? '✅ Solved' : '⏳ Playing'}</td>
                         </tr>
                     ))}
-
-                    {/* If no games are available, show a message */}
+                    
                     {games.length === 0 && (
                         <tr>
                             <td colSpan="4" style={{ textAlign: 'center', padding: '15px' }}>
