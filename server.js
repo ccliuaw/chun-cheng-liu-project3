@@ -12,7 +12,8 @@ const app = express();
 // --- CORS settings ---
 const allowedOrigins = [
     'http://localhost:5173', 
-    'https://your-frontend.vercel.app'
+    'https://your-frontend.vercel.app',
+    'https://chun-cheng-liu-project3.vercel.app/'
 ];
 
 app.use(cors({
