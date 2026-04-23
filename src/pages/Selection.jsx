@@ -9,7 +9,7 @@ export default function Selection() {
 
     const fetchGames = async () => {
         try {
-            const response = await fetch('http://localhost:8000/api/sudoku', {
+            const response = await fetch('https://chun-cheng-liu-project3.onrender.com/api/sudoku', {
                 credentials: 'include'
             });
             const data = await response.json();
@@ -35,7 +35,7 @@ export default function Selection() {
         const newPuzzle = difficulty === 'EASY' ? generateEasyBoard() : generateNormalBoard();
 
         try {
-            const response = await fetch('http://localhost:8000/api/sudoku', {
+            const response = await fetch('https://chun-cheng-liu-project3.onrender.com/api/sudoku', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', 

@@ -15,7 +15,7 @@ export default function Login() {
         setErrorMsg('');
 
         try {
-            const response = await fetch('http://localhost:8000/api/user/login', {
+            const response = await fetch('https://chun-cheng-liu-project3.onrender.com/api/user/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

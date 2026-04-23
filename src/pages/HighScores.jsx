@@ -9,7 +9,7 @@ export default function HighScores() {
         const fetchHighScores = async () => {
             try {
                 // Fetch high score data from the backend [cite: 110]
-                const response = await fetch('http://localhost:8000/api/sudoku/highscore/list', {
+                const response = await fetch('https://chun-cheng-liu-project3.onrender.com/api/sudoku/highscore/list', {
                     credentials: 'include'
                 });
                 const data = await response.json();

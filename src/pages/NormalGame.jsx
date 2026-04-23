@@ -20,7 +20,7 @@ const handleDelete = async () => {
     if (!confirmDelete) return;
 
     try {
-        const response = await fetch(`http://localhost:8000/api/sudoku/${id}`, {
+        const response = await fetch(`https://chun-cheng-liu-project3.onrender.com/api/sudoku/${id}`, {
             method: 'DELETE',
             credentials: 'include'
         });
@@ -41,7 +41,7 @@ const handleDelete = async () => {
     useEffect(() => {
         const fetchNormalGame = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/sudoku/${id}`, {
+                const response = await fetch(`https://chun-cheng-liu-project3.onrender.com/api/sudoku/${id}`, {
                     credentials: 'include'
                 });
                 const data = await response.json();
@@ -64,7 +64,7 @@ const handleDelete = async () => {
     useEffect(() => {
         const fetchGame = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/api/sudoku/${id}`, {
+                const response = await fetch(`https://chun-cheng-liu-project3.onrender.com/api/sudoku/${id}`, {
                     credentials: 'include'
                 });
                 const data = await response.json();

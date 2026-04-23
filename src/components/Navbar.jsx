@@ -8,7 +8,7 @@ export default function Navbar() {
 
     const handleLogout = async () => {
         try {
-            await fetch('http://localhost:8000/api/user/logout', {
+            await fetch('https://chun-cheng-liu-project3.onrender.com//api/user/logout', {
                 method: 'POST',
                 credentials: 'include'
             });
